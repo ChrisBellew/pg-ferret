@@ -22,6 +22,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Build Postgres debug image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./postgres
+          file: ./postgres/Dockerfile
+          push: false
+          tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
