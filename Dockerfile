@@ -1,21 +1,32 @@
-FROM cbellew/pg-ferret-postgres-16:latest as builder
+FROM cbellew/pg-ferret-postgres-16:latest
 
+RUN apt-get update
 WORKDIR /app
 
-# Install dependencies and Rust
-RUN apt-get update && \
-    apt-get install -y curl git libelf-dev build-essential software-properties-common \
-    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y \
-    && export PATH="/root/.cargo/bin:${PATH}" \
-    && rustup toolchain install nightly-2024-05-18 \
-    && rustup default nightly-2024-05-18 \
-    && rustup component add rust-src --toolchain nightly-2024-05-18 \
-    && cargo install bpf-linker \
-    && git clone --recurse-submodules https://github.com/libbpf/bpftool.git \
-    && cd bpftool/src && make install && cd /app \
-    && rm -rf /var/lib/apt/lists/* /app/bpftool \
-    && apt-get clean
+# Install rust 
+#RUN apt-get update
+#RUN apt install -y curl git linux-tools-common libelf-dev pkgconf
+RUN apt install -y curl
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup toolchain install nightly-2024-05-18
+RUN rustup default nightly-2024-05-18
+RUN rustup component add rust-src --toolchain nightly-2024-05-18
 
+# Install bpf-linker
+RUN apt install -y build-essential
+RUN cargo install bpf-linker
+
+# Install bpftool
+RUN apt install -y git libelf-dev
+RUN git clone --recurse-submodules https://github.com/libbpf/bpftool.git
+WORKDIR /app/bpftool/src
+RUN make install
+WORKDIR /app
+
+RUN apt-get install -y gosu
+
+# Install Tempo and Grafana
 RUN ARCH=$(uname -m) && \
   if [ "$ARCH" = "x86_64" ]; then \
     TEMPO_ARCH="amd64"; \
@@ -24,33 +35,20 @@ RUN ARCH=$(uname -m) && \
   else \
     echo "Unsupported architecture: $ARCH"; exit 1; \
   fi && \
-  curl -L -o tempo_2.0.0_linux_$TEMPO_ARCH.deb https://github.com/grafana/tempo/releases/download/v2.0.0/tempo_2.0.0_linux_$TEMPO_ARCH.deb
-
-# Copy source code and build
-COPY /apps /app
-RUN /root/.cargo/bin/cargo xtask build-ebpf --release \
-    && /root/.cargo/bin/cargo build --release
-    
-# Final stage
-FROM cbellew/pg-ferret-postgres-16:latest
-
-WORKDIR /app
-COPY --from=builder /app/target/release/userspace-collector /usr/local/bin/userspace-collector
-COPY --from=builder /app/tempo_2.0.0_linux_*.deb /app
-
-# Install Tempo and Grafana
-RUN apt-get update \
-  && apt-get install -y software-properties-common curl \
+  curl -L -o tempo_2.0.0_linux_$TEMPO_ARCH.deb https://github.com/grafana/tempo/releases/download/v2.0.0/tempo_2.0.0_linux_$TEMPO_ARCH.deb && \
+  dpkg -i tempo_2.0.0_linux_$TEMPO_ARCH.deb && \
+  rm tempo_2.0.0_linux_$TEMPO_ARCH.deb
+RUN apt-get install -y software-properties-common \
   && add-apt-repository "deb https://packages.grafana.com/oss/deb stable main" \
   && curl -s https://packages.grafana.com/gpg.key | apt-key add - \
   && apt-get update \
-  && apt-get install -y grafana \
-  && dpkg -i tempo_2.0.0_linux_*.deb \
-  && rm tempo_2.0.0_linux_*.deb \
-  && apt-get install -y grafana \
-  && apt-get remove -y software-properties-common curl \ 
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+  && apt-get install -y grafana
+
+RUN rm -rf /var/lib/apt/lists/*
+
+COPY /apps /app
+RUN cargo xtask build-ebpf --release
+RUN cargo build --release
 
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
