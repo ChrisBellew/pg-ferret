@@ -16,18 +16,6 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/* /app/bpftool \
     && apt-get clean
 
-# Copy source code and build
-COPY /apps /app
-RUN /root/.cargo/bin/cargo xtask build-ebpf --release \
-    && /root/.cargo/bin/cargo build --release
-
-# Final stage
-FROM cbellew/pg-ferret-postgres-16:latest
-
-WORKDIR /app
-COPY --from=builder /app/target/release/userspace-collector /usr/local/bin/userspace-collector
-
-# Install Tempo and Grafana
 RUN ARCH=$(uname -m) && \
   if [ "$ARCH" = "x86_64" ]; then \
     TEMPO_ARCH="amd64"; \
@@ -37,8 +25,24 @@ RUN ARCH=$(uname -m) && \
     echo "Unsupported architecture: $ARCH"; exit 1; \
   fi && \
   curl -L -o tempo_2.0.0_linux_$TEMPO_ARCH.deb https://github.com/grafana/tempo/releases/download/v2.0.0/tempo_2.0.0_linux_$TEMPO_ARCH.deb && \
-  dpkg -i tempo_2.0.0_linux_$TEMPO_ARCH.deb && \
-  rm tempo_2.0.0_linux_$TEMPO_ARCH.deb && \
+
+# Copy source code and build
+COPY /apps /app
+RUN /root/.cargo/bin/cargo xtask build-ebpf --release \
+    && /root/.cargo/bin/cargo build --release
+    
+# Final stage
+FROM cbellew/pg-ferret-postgres-16:latest
+
+WORKDIR /app
+COPY --from=builder /app/target/release/userspace-collector /usr/local/bin/userspace-collector
+COPY --from=builder /app/tempo_2.0.0_linux_*.deb /app
+
+# Install Tempo and Grafana
+RUN
+  apt-get update && \
+  dpkg -i tempo_2.0.0_linux_*.deb && \
+  rm tempo_2.0.0_linux_*.deb && \
   apt-get install -y grafana && \
   rm -rf /var/lib/apt/lists/*
 
