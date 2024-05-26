@@ -22,9 +22,9 @@ fi
 #cd postgres
 #./build.sh
 
-git clone https://github.com/docker-library/postgres.git /postgres-docker
+git clone https://github.com/docker-library/postgres.git postgres-docker
 
-cd /postgres-docker/16/bookworm
+cd postgres-docker/16/bookworm
 
 
 # Replace 'amd64 | arm64 | ppc64el | s390x' with 'dummy'
