@@ -23,7 +23,7 @@ jobs:
       #     password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Run Postgres build script
-        run: ./postgres/build.sh
+        run: ./build-postgres.sh
       # - name: Build Postgres debug image
       #   uses: docker/build-push-action@v4
       #   with:
