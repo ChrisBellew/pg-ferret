@@ -24,11 +24,11 @@ echo "Starting Grafana..."
 echo "Starting Tempo..."
 /usr/bin/tempo --config.file=/etc/tempo/tempo.yaml > >(prefix_logs "tempo") 2> >(prefix_logs "tempo" >&2) &
 
-sleep 20
+# sleep 20
 
-PGPASSWORD=mypassword /usr/lib/postgresql/16/bin/psql -U myuser mydb -c "SELECT COUNT(*) from pg_tablespace"
+# PGPASSWORD=mypassword /usr/lib/postgresql/16/bin/psql -U myuser mydb -c "SELECT COUNT(*) from pg_tablespace"
 
-sleep 200000
+# sleep 200000
 
 # Wait for all background processes to finish
 wait -n

@@ -4,7 +4,7 @@
 
 [![CI][build-badge]][build-url]
 
-All-in-one tracing toolkit for Postgres. Batteries included.
+**All-in-one tracing toolkit for Postgres. Batteries included.**
 
 ![](screenshot.png)
 
@@ -14,7 +14,7 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 - Observe traces of your queries inside Postgres
 - Correlate Postgres query spans with your application spans
-- Low overhead auto-instrumentation with eBPF. Rust in the kernel and userspace. [Obligatory _blazingly fast_]
+- Low overhead auto-instrumentation with eBPF. Rust in the kernel and userspace [Obligatory _blazingly fast_].
 - Built in trace storage with Grafana Tempo and trace visualisation with Grafana
   - Or bring your own OpenTelemetry backend (Grafana Tempo, Jaeger, Zipkin, Honeycomb, Datadog, etc.)
 - Special debug build of Postgres included. Small (currently unmeasured) performance overhead
@@ -31,11 +31,26 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 ### Quick start
 
-To give it a spin, try the all-in-one Docker image. This creates a container with Postgres, PG Ferret, Grafana Tempo and Grafana inside. Use it just like a normal Postgres container.
+To give it a spin, try the all-in-one Docker image. This creates a container with Postgres, PG Ferret, Grafana Tempo and Grafana inside. Use it just like a normal Postgres container. You will need to run it in privileged mode for eBPF to work though.
 
-```sh
-# Start the all-in-one image
-docker run -it -e POSTGRES_DB=mydb -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypass --privileged -p 5432:5432 -p 3000:3000 cbellew/pg-ferret
+```bash
+# Start the all-in-one container
+docker run -it \
+  -e POSTGRES_DB=mydb \
+  -e POSTGRES_USER=myuser \
+  -e POSTGRES_PASSWORD=mypass \
+  --privileged -p 5432:5432 -p 3000:3000 \
+  cbellew/pg-ferret
+
+# Wait a second and fire a test query
+docker run --rm \
+  -e PGPASSWORD=mypassword --network=host \
+  postgres:16 \
+  /usr/lib/postgresql/16/bin/psql -U myuser -h localhost -p 5432 -d mydb -c \
+  "SELECT COUNT(*) FROM pg_tablespace"
+
+# Check out the trace inside the embedded Grafana
+open http://localhost:3000
 ```
 
 ## How it works
