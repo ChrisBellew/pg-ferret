@@ -62,7 +62,7 @@ jobs:
 
       - name: Build Docker image with pg-ferret-postgres-16 base
         run: |
-          docker buildx build --tag pg-ferret:latest --push .
+          docker buildx build --tag cbellew/pg-ferret:latest --push .
 
       - name: Logout from Docker Hub
         run: docker logout
