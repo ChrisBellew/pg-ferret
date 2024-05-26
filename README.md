@@ -2,7 +2,7 @@
 
 # PG Ferret
 
-[![CI][build-badge]][build-url]
+![[CI][build-badge]](https://github.com/ChrisBellew/pg-ferret/actions/workflows/build.yml/badge.svg)
 
 **All-in-one tracing toolkit for Postgres. Batteries included.**
 
@@ -60,5 +60,3 @@ open http://localhost:3000/explore?left=%7B%22datasource%22%3A%22tempo%22%2C%22q
 - The eBPF loader needs the memory address of each function you want to attach to. These are commonly sought from the _debugging symbols_ which are produced when a program is built, and provide a mapping from function name to memory address in the compiled executable. Debugging symbols can be embedded within the executable itself and if so, the eBPF loader has everything it needs to inject the eBPF program into the kernel and it attach it to the relevant functions.
 - PG Ferret embeds a simple program into the kernel which attaches to a few dozen key functions inside Postgres.
 - In a standard build of Postgres the debugging symbols are partially or fully stripped, which is unhelpful for eBPF, so PG Ferret ships with a special build of Postgres with these symbols intact.
-
-[build-url]: https://github.com/ChrisBellew/pg-ferret/actions/workflows/build.yml
