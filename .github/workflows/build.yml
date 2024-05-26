@@ -12,11 +12,11 @@ jobs:
       group: build-${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest] #ubuntu-latest,
+        os: [self-hosted] #ubuntu-latest,
         include:
           # - os: ubuntu-latest
           #   architecture: amd64
-          - os: macos-latest
+          - os: self-hosted
             architecture: arm64
 
     steps:
