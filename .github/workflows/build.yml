@@ -28,6 +28,7 @@ jobs:
           context: ./postgres
           file: ./postgres/Dockerfile
           push: false
+          load: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
 
       - name: Build and push Docker image
