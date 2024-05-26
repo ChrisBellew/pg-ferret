@@ -21,7 +21,8 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 ## Why
 
-- Postgres has various plugins which provide aggregated metrics into queries and locks. These are very useful, but don't provide much insight into the inner workings of Postgres.
+- Postgres has various plugins which provide aggregated metrics into queries and locks. These are very useful, but don't tell the full story of a query path in Postgres.
+- Knowing more about the internals of Postgres helps make us better engineers.
 - Tracing is the gold standard of observability. PG Ferret aims to bring Postgres tracing to the masses.
 
 ## How it works
