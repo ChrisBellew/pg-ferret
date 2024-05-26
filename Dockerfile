@@ -40,7 +40,7 @@ COPY --from=builder /app/tempo_2.0.0_linux_*.deb /app
 
 # Install Tempo and Grafana
 RUN apt-get update \
-  && software-properties-common \
+  && apt-get install -y software-properties-common \
   && add-apt-repository "deb https://packages.grafana.com/oss/deb stable main" \
   && curl -s https://packages.grafana.com/gpg.key | apt-key add - \
   && apt-get update \
