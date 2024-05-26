@@ -59,8 +59,7 @@ jobs:
             --platform linux/${{ matrix.architecture }} \
             --cache-from type=local,src=/tmp/.buildx-cache \
             --cache-to type=local,dest=/tmp/.buildx-cache-new \
-            --tag pg-ferret:temp \
-            --push .
+            --tag pg-ferret:temp .
           docker tag pg-ferret:temp ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
           docker push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
 
