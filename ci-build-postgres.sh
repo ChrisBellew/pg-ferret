@@ -7,17 +7,17 @@ set -e
 #!/bin/bash
 
 # Load the cache key from an environment variable
-CACHE_KEY=$1
+# CACHE_KEY=$1
 
-# Ensure the Docker buildx builder is set up
-# docker buildx create --use --name mybuilder
+# # Ensure the Docker buildx builder is set up
+# # docker buildx create --use --name mybuilder
 
-# # Load the cache from the GitHub Actions cache
-# docker load -i /tmp/docker_cache_$CACHE_KEY.tar || true
+# # # Load the cache from the GitHub Actions cache
+# # docker load -i /tmp/docker_cache_$CACHE_KEY.tar || true
 
-if [ -f /tmp/docker_cache_$CACHE_KEY.tar ]; then
-  docker load -i /tmp/docker_cache_$CACHE_KEY.tar
-fi
+# if [ -f /tmp/docker_cache_$CACHE_KEY.tar ]; then
+#   docker load -i /tmp/docker_cache_$CACHE_KEY.tar
+# fi
 
 #cd postgres
 #./build.sh
@@ -39,7 +39,7 @@ sed -i 's/apt-get source --compile "postgresql-$PG_MAJOR=$PG_VERSION"/apt-get so
 
 # Build the PostgreSQL image with debug symbols
 #docker buildx build --cache-from type=local,src=/tmp/$CACHE_KEY --cache-to type=local,dest=/tmp/$CACHE_KEY,mode=max -t pg-ferret-postgres-16:latest .
-docker buildx build --cache-from type=local,src=/tmp/docker_cache_$CACHE_KEY --cache-to type=local,dest=/tmp/docker_cache_$CACHE_KEY,mode=max -t pg-ferret-postgres-16:latest .
+docker buildx build --cache-from type=local,src=/tmp/.buildx-cache/docker-image.tar --cache-to type=local,dest=/tmp/.buildx-cache/docker-image.tar,mode=max -t pg-ferret-postgres-16:latest .
 
 
 # # Set variables
@@ -65,4 +65,4 @@ docker buildx build --cache-from type=local,src=/tmp/docker_cache_$CACHE_KEY --c
 #docker buildx build --cache-from type=local,src=/tmp/docker_cache_$CACHE_KEY --cache-to type=local,dest=/tmp/docker_cache_$CACHE_KEY,mode=max -t myimage:latest .
 
 # Save the cache to a tar file
-docker save -o /tmp/docker_cache_$CACHE_KEY.tar pg-ferret-postgres-16:latest
+#docker save -o /tmp/docker_cache_$CACHE_KEY.tar pg-ferret-postgres-16:latest
