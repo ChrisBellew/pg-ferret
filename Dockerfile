@@ -39,7 +39,7 @@ COPY --from=builder /app/target/release/userspace-collector /usr/local/bin/users
 COPY --from=builder /app/tempo_2.0.0_linux_*.deb /app
 
 # Install Tempo and Grafana
-RUN apt-get install -y software-properties-common \
+RUN apt-get update \
   && add-apt-repository "deb https://packages.grafana.com/oss/deb stable main" \
   && curl -s https://packages.grafana.com/gpg.key | apt-key add - \
   && apt-get update \

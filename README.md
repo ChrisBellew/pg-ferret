@@ -2,9 +2,11 @@
 
 # PG Ferret
 
-![[CI][build-badge]](https://github.com/ChrisBellew/pg-ferret/actions/workflows/build.yml/badge.svg)
-
 **All-in-one tracing toolkit for Postgres. Batteries included.**
+
+![CI Status](https://github.com/ChrisBellew/pg-ferret/actions/workflows/build.yml/badge.svg)
+[![Docker](https://img.shields.io/badge/Docker-available-blue.svg?style=flat&logo=docker)](https://hub.docker.com/r/cbellew/pg-ferret/tags)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/ChrisBellew/pg-ferret/blob/main/LICENSE)
 
 ![](screenshot.png)
 
