@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-cd postgres
-./build.sh
+# cd postgres
+# ./build.sh
 
 #!/bin/bash
 
@@ -31,7 +31,7 @@ IMAGE_NAME="postgres-builder:latest"
 # fi
 
 # Build the preparation Docker image
-docker build -t $IMAGE_NAME ./postgres
+docker build -t $IMAGE_NAME ./postgres -f ./postgres/Dockerfile.builder
 
 # Run the container with Docker socket
 docker run --name $CONTAINER_NAME --rm -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp -e CACHE_KEY=$CACHE_KEY $IMAGE_NAME
