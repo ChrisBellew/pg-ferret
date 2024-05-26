@@ -20,9 +20,11 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 ⚡️ Low overhead auto-instrumentation with eBPF. Rust in the kernel and userspace [Obligatory _blazingly fast_].
 
-- Built in trace storage with Grafana Tempo and trace visualisation with Grafana <!--  - Or bring your own OpenTelemetry backend (Grafana Tempo, Jaeger, Zipkin, Honeycomb, Datadog, etc.)-->
-- Special debug build of Postgres included. Small (currently unmeasured) performance overhead
-- Intended for non-production use in debugging slow queries
+🗃️ Built in trace storage with Grafana Tempo and trace visualisation with Grafana <!--  - Or bring your own OpenTelemetry backend (Grafana Tempo, Jaeger, Zipkin, Honeycomb, Datadog, etc.)-->
+
+📦 Special debug build of Postgres included. Small (currently unmeasured) performance overhead
+
+🛠️ Intended for non-production use in debugging slow queries
 
 🚀 Built with 💙 using the power of Rust and [Aya](https://github.com/aya-rs/aya)
 
