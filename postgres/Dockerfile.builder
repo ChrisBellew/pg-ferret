@@ -28,12 +28,5 @@ WORKDIR /postgres-docker/16/bookworm
 COPY build-postgres.sh /usr/local/bin/build-postgres.sh
 RUN chmod +x /usr/local/bin/build-postgres.sh
 
-# Create a script to initialize buildx
-RUN echo '#!/bin/bash\n\
-    set -e\n\
-    docker buildx create --use\n\
-    exec "$@"' > /usr/local/bin/init-buildx.sh \
-    && chmod +x /usr/local/bin/init-buildx.sh
-
 CMD ["/bin/sh", "/usr/local/bin/build-postgres.sh"]
 
