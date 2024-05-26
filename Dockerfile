@@ -1,4 +1,4 @@
-FROM pg-ferret-postgres-16:latest
+FROM cbellew/pg-ferret-postgres-16:latest
 
 RUN apt-get update
 WORKDIR /app
