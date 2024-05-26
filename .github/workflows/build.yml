@@ -29,7 +29,7 @@ jobs:
 
       - name: Load Docker cache
         if: steps.cache-docker-layers.outputs.cache-hit == 'true'
-        run: docker load -i /tmp/.buildx-cache/docker-image.tar
+        run: docker load -i /tmp/.buildx-cache/docker-image.tar || echo "Cache not found, proceeding without it"
 
       - name: Run Postgres build script
         run: ./ci-build-postgres.sh ${{ steps.cache-docker-layers.outputs.cache-hit }}
