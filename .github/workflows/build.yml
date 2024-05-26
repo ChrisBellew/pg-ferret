@@ -43,10 +43,15 @@ jobs:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-postgres
 
+      - name: Load Docker cache
+        run: |
+          if [[ -f /tmp/.buildx-cache/docker-image.tar ]]; then
+            docker load -i /tmp/.buildx-cache/docker-image.tar
+          fi
+
       - name: Build Docker image with pg-ferret-postgres-16 base
         run: |
-          docker load -i /tmp/.buildx-cache/docker-image.tar || echo "Cache not found, proceeding without it"
-          docker buildx build --build-arg BASE_IMAGE=pg-ferret-postgres-16:latest --tag my-app:latest --load .
+          docker buildx build --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache,mode=max --build-arg BASE_IMAGE=pg-ferret-postgres-16:latest --tag my-app:latest --load .
 
       - name: Logout from Docker Hub
         run: docker logout
