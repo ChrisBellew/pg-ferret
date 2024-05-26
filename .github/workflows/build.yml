@@ -45,7 +45,8 @@ jobs:
 
       - name: Build Docker image with pg-ferret-postgres-16 base
         run: |
-          docker buildx build --tag ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest --build-arg BASE_IMAGE=pg-ferret-postgres-16:latest --load .
+          docker load -i /tmp/.buildx-cache/docker-image.tar || echo "Cache not found, proceeding without it"
+          docker buildx build --build-arg BASE_IMAGE=pg-ferret-postgres-16:latest --tag my-app:latest --load .
 
       - name: Logout from Docker Hub
         run: docker logout
