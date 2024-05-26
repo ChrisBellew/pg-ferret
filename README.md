@@ -35,7 +35,7 @@ To give it a spin, try the all-in-one Docker image. This creates a container wit
 
 ```bash
 # Start the all-in-one container
-docker pull cbellew/pg-ferret:latest && \
+docker pull cbellew/pg-ferret:latest &&
 docker run -it \
   -e POSTGRES_DB=mydb \
   -e POSTGRES_USER=myuser \
@@ -43,16 +43,16 @@ docker run -it \
   --privileged -p 5432:5432 -p 3000:3000 \
   cbellew/pg-ferret:latest
 
-# Wait a second for postgres to start, then fire a test query
+# Wait a second and fire a test query
 docker run --rm \
   -e PGPASSWORD=mypass \
-  --network=host \ # Share the host network so it can find the postgres container
+  --network=host \
   postgres:16 \
   /usr/lib/postgresql/16/bin/psql -U myuser -h localhost -p 5432 -d mydb -c \
   "SELECT COUNT(*) FROM pg_tablespace"
 
 # Check out the trace inside the embedded Grafana
-open http://localhost:3000/explore?left={"datasource":"tempo","queries":[{"queryType":"traceqlSearch"}]}
+open http://localhost:3000/explore?left=%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22queryType%22%3A%22traceqlSearch%22%7D%5D%7D
 ```
 
 ## How it works
