@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     concurrency:
-      group: build
+      group: build-${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
