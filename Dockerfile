@@ -40,6 +40,7 @@ COPY --from=builder /app/tempo_2.0.0_linux_*.deb /app
 
 # Install Tempo and Grafana
 RUN apt-get update \
+  && software-properties-common \
   && add-apt-repository "deb https://packages.grafana.com/oss/deb stable main" \
   && curl -s https://packages.grafana.com/gpg.key | apt-key add - \
   && apt-get update \
@@ -47,8 +48,9 @@ RUN apt-get update \
   && dpkg -i tempo_2.0.0_linux_*.deb \
   && rm tempo_2.0.0_linux_*.deb \
   && apt-get install -y grafana \
-  && rm -rf /var/lib/apt/lists/* \
+  && apt-get remove -y software-properties-common \ 
   && apt-get clean
+  && rm -rf /var/lib/apt/lists/* \
 
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
