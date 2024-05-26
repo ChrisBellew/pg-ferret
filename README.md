@@ -6,6 +6,8 @@
 
 All-in-one tracing toolkit for Postgres. Batteries included.
 
+![](screenshot.png)
+
 </div>
 
 ## Features
@@ -24,6 +26,17 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 - Postgres has various plugins which provide aggregated metrics into queries and locks. These are very useful, but don't tell the full story of a query path in Postgres.
 - Knowing more about the internals of Postgres helps make us better engineers.
 - Tracing is the gold standard of observability. PG Ferret aims to bring Postgres tracing to the masses.
+
+## Usage
+
+### Quick start
+
+To give it a spin, try the all-in-one Docker image. This creates a container with Postgres, PG Ferret, Grafana Tempo and Grafana inside. Use it just like a normal Postgres container.
+
+```sh
+# Start the all-in-one image
+docker run -it -e POSTGRES_DB=mydb -e POSTGRES_USER=myuser -e POSTGRES_PASSWORD=mypass --privileged -p 5432:5432 -p 3000:3000 cbellew/pg-ferret
+```
 
 ## How it works
 

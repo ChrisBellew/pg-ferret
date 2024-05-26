@@ -54,12 +54,6 @@ jobs:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-postgres
 
-      # - name: Load Docker cache
-      #   run: |
-      #     if [[ -f /tmp/.buildx-cache/docker-image.tar ]]; then
-      #       docker load -i /tmp/.buildx-cache/docker-image.tar
-      #     fi
-
       - name: Build Docker image with pg-ferret-postgres-16 base
         run: |
           docker buildx build --tag cbellew/pg-ferret:latest --push .
