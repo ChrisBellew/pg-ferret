@@ -1,9 +1,16 @@
 FROM alpine:3.19
 
 # Install necessary packages
+# RUN apk add --no-cache \
+#     git \
+#     docker-cli
 RUN apk add --no-cache \
+    docker-cli \
+    bash \
+    curl \
     git \
-    docker-cli
+    build-base \
+    libc6-compat
 
 # Install Docker Buildx
 RUN mkdir -p ~/.docker/cli-plugins/ \
