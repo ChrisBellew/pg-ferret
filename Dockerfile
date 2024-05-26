@@ -49,8 +49,8 @@ RUN apt-get update \
   && rm tempo_2.0.0_linux_*.deb \
   && apt-get install -y grafana \
   && apt-get remove -y software-properties-common \ 
-  && apt-get clean
-  && rm -rf /var/lib/apt/lists/* \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh

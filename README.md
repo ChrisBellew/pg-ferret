@@ -26,7 +26,7 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 🛠️ Intended for non-production use in debugging slow queries
 
-🚀 Built with 💙 using the power of Rust and [Aya](https://github.com/aya-rs/aya)
+🚀 Built with 💛 using the power of Rust and [Aya](https://github.com/aya-rs/aya)
 
 ## Why
 
