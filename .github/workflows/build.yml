@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: build
+    # strategy:
+    #   matrix:
+    #     os: [ubuntu-latest, macos-latest]
+    #     include:
+    #       - os: ubuntu-latest
+    #         architecture: amd64
+    #       - os: macos-latest
+    #         architecture: arm64
 
     steps:
       - name: Checkout code
