@@ -25,7 +25,7 @@ RUN /root/.cargo/bin/cargo xtask build-ebpf --release \
 FROM cbellew/pg-ferret-postgres-16:latest
 
 WORKDIR /app
-COPY --from=builder /app/target/release/your_binary /app/your_binary
+COPY --from=builder /app/target/release/userspace-collector /usr/local/bin/userspace-collector
 
 # Install Tempo and Grafana
 RUN ARCH=$(uname -m) && \
