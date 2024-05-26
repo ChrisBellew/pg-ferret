@@ -29,7 +29,7 @@ jobs:
           file: ./postgres/Dockerfile
           push: false
           load: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
+          tags: pg-ferret-postgres-16:latest
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
