@@ -10,10 +10,14 @@ set -e
 CACHE_KEY=$1
 
 # Ensure the Docker buildx builder is set up
-docker buildx create --use --name mybuilder
+# docker buildx create --use --name mybuilder
 
-# Load the cache from the GitHub Actions cache
-docker load -i /tmp/docker_cache_$CACHE_KEY.tar || true
+# # Load the cache from the GitHub Actions cache
+# docker load -i /tmp/docker_cache_$CACHE_KEY.tar || true
+
+if [ -f /tmp/docker_cache_$CACHE_KEY.tar ]; then
+  docker load -i /tmp/docker_cache_$CACHE_KEY.tar
+fi
 
 #cd postgres
 #./build.sh
