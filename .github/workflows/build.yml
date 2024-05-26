@@ -12,12 +12,12 @@ jobs:
       group: build-${{ matrix.os }}
     strategy:
       matrix:
-        os: [self-hosted] #ubuntu-latest,
+        os: [ubuntu-latest] #self-hosted,
         include:
-          # - os: ubuntu-latest
-          #   architecture: amd64
-          - os: self-hosted
-            architecture: arm64
+          - os: ubuntu-latest
+            architecture: amd64
+          # - os: self-hosted
+          #   architecture: arm64
 
     steps:
       - name: Checkout code
@@ -25,6 +25,17 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+
+      - name: Cache Docker layers
+        id: docker-cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.os }}-${{ matrix.architecture }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ matrix.os }}-${{ matrix.architecture }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -44,7 +55,18 @@ jobs:
       # Build pg-ferret image
       - name: Build Docker image with pg-ferret-postgres-16 base
         run: |
-          docker buildx build --platform linux/${{ matrix.architecture }} --tag ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest --push .
+          docker buildx build \
+            --platform linux/${{ matrix.architecture }} \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache-new \
+            --tag ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest \
+            --push .
+
+      - name: Update Docker cache
+        if: success()
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Logout from Docker Hub
         run: docker logout
