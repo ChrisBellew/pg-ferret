@@ -24,7 +24,7 @@ RUN ARCH=$(uname -m) && \
   else \
     echo "Unsupported architecture: $ARCH"; exit 1; \
   fi && \
-  curl -L -o tempo_2.0.0_linux_$TEMPO_ARCH.deb https://github.com/grafana/tempo/releases/download/v2.0.0/tempo_2.0.0_linux_$TEMPO_ARCH.deb && \
+  curl -L -o tempo_2.0.0_linux_$TEMPO_ARCH.deb https://github.com/grafana/tempo/releases/download/v2.0.0/tempo_2.0.0_linux_$TEMPO_ARCH.deb
 
 # Copy source code and build
 COPY /apps /app
