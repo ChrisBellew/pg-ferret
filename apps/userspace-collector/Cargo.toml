@@ -1,0 +1,30 @@
+[package]
+name = "userspace-collector"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+aya = "0.12"
+aya-log = "0.2"
+clap = { version = "4.1", features = ["derive"] }
+pg-ferret-shared = { path = "../shared", features = ["user"] }
+anyhow = "1"
+env_logger = "0.10"
+libc = "0.2"
+log = "0.4"
+tokio = { version = "1.25", features = ["macros", "rt", "rt-multi-thread", "net", "signal"] }
+object = "0.35.0"
+bytes = "1.6.0"
+opentelemetry = "0.22"
+opentelemetry_sdk = { version = "0.22", features = ["rt-tokio"] }
+opentelemetry-stdout = { version = "0.3", features = ["trace"] }
+opentelemetry-otlp = "0.15.0"
+opentelemetry-semantic-conventions = "0.14.0"
+rand = "0.8.5"
+regex = "1.10.4"
+serde_json = "1.0.117"
+
+[[bin]]
+name = "userspace-collector"
+path = "src/main.rs"

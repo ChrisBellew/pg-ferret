@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres
+    container_name: pg_ferret_postgres
+    ports:
+      - 5442:5432
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: db
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+
+  tracer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pg_ferret_tracer
+    depends_on:
+      - postgres
+    pid: host
+    privileged: true
+    volumes:
+      - /usr/local/pgsql/bin/postgres:/usr/local/pgsql/bin/postgres
+# volumes:
+#   postgres_data:

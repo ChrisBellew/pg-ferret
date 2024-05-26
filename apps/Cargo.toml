@@ -1,0 +1,2 @@
+[workspace]
+members = ["xtask", "userspace-collector", "shared"]

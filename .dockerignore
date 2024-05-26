@@ -1,0 +1,7 @@
+*
+!postgres/
+!apps/
+!start.sh
+!grafana.ini
+!tempo-datasource.yaml
+!tempo.yaml
