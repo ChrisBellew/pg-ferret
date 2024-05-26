@@ -43,5 +43,12 @@ jobs:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-postgres
 
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
+
       - name: Logout from Docker Hub
         run: docker logout
