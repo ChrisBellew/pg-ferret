@@ -26,7 +26,6 @@ git clone https://github.com/docker-library/postgres.git postgres-docker
 
 cd postgres-docker/16/bookworm
 
-
 # Replace 'amd64 | arm64 | ppc64el | s390x' with 'dummy'
 sed -i 's/amd64 | arm64 | ppc64el | s390x/dummy/' Dockerfile
 
