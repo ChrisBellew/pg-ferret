@@ -59,9 +59,9 @@ jobs:
             --platform linux/${{ matrix.architecture }} \
             --cache-from type=local,src=/tmp/.buildx-cache \
             --cache-to type=local,dest=/tmp/.buildx-cache-new \
-            --tag ${{ secrets.DOCKER_USERNAME }}/pg-ferret \
+            --tag ${{ secrets.DOCKER_USERNAME }}/pg-ferret:temp \
             --push .
-          docker tag pg-ferret ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
+          docker tag pg-ferret:temp ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
           docker push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
 
       - name: Update Docker cache
