@@ -16,7 +16,7 @@ prefix_logs() {
 
 # Run the pg-ferret binary in the background. Redirect the output to stdout
 # and stderr so that it can be captured by the Docker logs.
-RUST_LOG=info /usr/local/bin/userspace-collector --runner= > >(prefix_logs "pg-ferret") 2> >(prefix_logs "pg-ferret" >&2) &
+RUST_LOG=info cargo xtask run --release --runner= > >(prefix_logs "pg-ferret") 2> >(prefix_logs "pg-ferret" >&2) &
 
 echo "Starting Grafana..."
 /usr/sbin/grafana-server --config=/etc/grafana/grafana.ini --homepath=/usr/share/grafana > >(prefix_logs "grafana") 2> >(prefix_logs "grafana" >&2) &
