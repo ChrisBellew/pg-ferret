@@ -44,12 +44,23 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: Dockerfile.test
+          #file: Dockerfile.test
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/test:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
           platforms: linux/amd64,linux/arm64
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
+      # Build pg-ferret image
+      # - name: Build Docker image with pg-ferret-postgres-16 base
+      #   run: |
+      #     docker buildx build \
+      #       --platform linux/${{ matrix.architecture }} \
+      #       --cache-from type=local,src=/tmp/.buildx-cache \
+      #       --cache-to type=local,dest=/tmp/.buildx-cache-new \
+      #       --tag pg-ferret:temp .
+      #     docker tag pg-ferret:temp ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
+      #     docker push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
+
       - name: Verify multi-architecture image
-        run: docker run --rm ${{ secrets.DOCKER_USERNAME }}/test:latest uname -m
+        run: docker run --rm ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest uname -m
