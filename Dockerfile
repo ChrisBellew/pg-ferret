@@ -10,13 +10,16 @@ RUN apt-get update \
     && rustup toolchain install nightly-2024-05-18 \
     && rustup default nightly-2024-05-18 \
     && rustup component add rust-src --toolchain nightly-2024-05-18 \
-    && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" \
-    && apt-get update && apt-get install -y libpolly-18-dev libzstd-dev \
+    && echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | sudo tee /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
+    && echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | sudo tee -a /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
+    && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
+    && apt-get update && apt-get install -y llvm-18-dev libclang-18-dev libpolly-18-dev \
     && cargo install bpf-linker --no-default-features \
     && git clone --recurse-submodules https://github.com/libbpf/bpftool.git \
     && cd bpftool/src && make install && cd /app \
     && rm -rf /var/lib/apt/lists/* /app/bpftool \
     && apt-get clean
+    #&& bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" \
 
 RUN ARCH=$(uname -m) && \
   if [ "$ARCH" = "x86_64" ]; then \
