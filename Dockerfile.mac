@@ -6,7 +6,9 @@ RUN apt-get install -y wget
 
 WORKDIR /app
 
-RUN apt-get install -y build-essential systemtap-sdt-dev libreadline-dev zlib1g-dev libsystemd-dev libicu-dev
+RUN apt-get install -y build-essential systemtap-sdt-dev libreadline-dev zlib1g-dev libsystemd-dev libicu-dev llvm-18-dev libclang-18-dev libpolly-18-dev
+
+RUN llvm-config --version
 
 # Install rust 
 RUN apt-get update
@@ -17,7 +19,6 @@ RUN rustup toolchain install nightly-aarch64-unknown-linux-gnu
 RUN rustup default nightly-aarch64-unknown-linux-gnu
 
 # Install bpf tools'
-RUN apt-get install -y llvm-18-dev libclang-18-dev libpolly-18-dev
 RUN cargo install bpf-linker --no-default-features
 WORKDIR /app
 RUN git clone --recurse-submodules https://github.com/libbpf/bpftool.git
