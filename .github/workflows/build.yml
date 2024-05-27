@@ -8,99 +8,99 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    concurrency:
-      group: build-${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest] # self-hosted,
-        include:
-          - os: ubuntu-latest
-            architecture: amd64
-          # - os: self-hosted
-          #   architecture: arm64
+  #   concurrency:
+  #     group: build-${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest] # self-hosted,
+  #       include:
+  #         - os: ubuntu-latest
+  #           architecture: amd64
+  #         # - os: self-hosted
+  #         #   architecture: arm64
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          install: true
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+  #       with:
+  #         install: true
 
-      - name: Cache Docker layers
-        id: docker-cache
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ matrix.os }}-${{ matrix.architecture }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-${{ matrix.os }}-${{ matrix.architecture }}
+  #     - name: Cache Docker layers
+  #       id: docker-cache
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: /tmp/.buildx-cache
+  #         key: ${{ runner.os }}-buildx-${{ matrix.os }}-${{ matrix.architecture }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-buildx-${{ matrix.os }}-${{ matrix.architecture }}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME }}
+  #         password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build postgres image
-      # - name: Run Postgres build script
-      #   run: ./ci-build-postgres.sh
+  #     # Build postgres image
+  #     # - name: Run Postgres build script
+  #     #   run: ./ci-build-postgres.sh
 
-      # - name: Push Postgres image to Docker Hub
-      #   run: |
-      #     docker tag pg-ferret-postgres-16:latest ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:${{ matrix.architecture }}
-      #     docker push ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:${{ matrix.architecture }}
+  #     # - name: Push Postgres image to Docker Hub
+  #     #   run: |
+  #     #     docker tag pg-ferret-postgres-16:latest ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:${{ matrix.architecture }}
+  #     #     docker push ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:${{ matrix.architecture }}
 
-      # Build pg-ferret image
-      - name: Build Docker image with pg-ferret-postgres-16 base
-        run: |
-          docker buildx build \
-            --platform linux/${{ matrix.architecture }} \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to type=local,dest=/tmp/.buildx-cache-new \
-            --tag pg-ferret:temp .
-          docker tag pg-ferret:temp ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
+  #     # Build pg-ferret image
+  #     - name: Build Docker image with pg-ferret-postgres-16 base
+  #       run: |
+  #         docker buildx build \
+  #           --platform linux/${{ matrix.architecture }} \
+  #           --cache-from type=local,src=/tmp/.buildx-cache \
+  #           --cache-to type=local,dest=/tmp/.buildx-cache-new \
+  #           --tag pg-ferret:temp .
+  #         docker tag pg-ferret:temp ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
+  #         docker push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:${{ matrix.architecture }}
 
-      - name: Update Docker cache
-        if: success()
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+  #     - name: Update Docker cache
+  #       if: success()
+  #       run: |
+  #         rm -rf /tmp/.buildx-cache
+  #         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-      - name: Logout from Docker Hub
-        run: docker logout
+  #     - name: Logout from Docker Hub
+  #       run: docker logout
 
-  manifest:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+  # manifest:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME }}
+  #         password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Create and push manifest list
-        run: |
-          docker manifest create ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:latest \
-            ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:amd64 \
-            ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:arm64
-          docker manifest create ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest \
-            ${{ secrets.DOCKER_USERNAME }}/pg-ferret:amd64 \
-            ${{ secrets.DOCKER_USERNAME }}/pg-ferret:arm64
+  #     - name: Create and push manifest list
+  #       run: |
+  #         docker manifest create ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:latest \
+  #           ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:amd64 \
+  #           ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:arm64
+  #         docker manifest create ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest \
+  #           ${{ secrets.DOCKER_USERNAME }}/pg-ferret:amd64 \
+  #           ${{ secrets.DOCKER_USERNAME }}/pg-ferret:arm64
 
-          docker manifest push ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:latest
-          docker manifest push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
+  #         docker manifest push ${{ secrets.DOCKER_USERNAME }}/pg-ferret-postgres-16:latest
+  #         docker manifest push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
 
-      # - name: Create and push manifest list
-      #   run: |
-      #     docker manifest create ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest \
-      #       ${{ secrets.DOCKER_USERNAME }}/pg-ferret:amd64 \
-      #       ${{ secrets.DOCKER_USERNAME }}/pg-ferret:arm64
+  #     # - name: Create and push manifest list
+  #     #   run: |
+  #     #     docker manifest create ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest \
+  #     #       ${{ secrets.DOCKER_USERNAME }}/pg-ferret:amd64 \
+  #     #       ${{ secrets.DOCKER_USERNAME }}/pg-ferret:arm64
 
-      #     docker manifest push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
+  #     #     docker manifest push ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
 
-      - name: Logout from Docker Hub
-        run: docker logout
+  #     - name: Logout from Docker Hub
+  #       run: docker logout
