@@ -10,6 +10,7 @@ RUN apt-get update && \
     && rustup toolchain install nightly-2024-05-18 \
     && rustup default nightly-2024-05-18 \
     && rustup component add rust-src --toolchain nightly-2024-05-18 \
+    && apt-get install -y llvm-18-dev libclang-18-dev libpolly-18-dev \
     && cargo install bpf-linker --no-default-features \
     && git clone --recurse-submodules https://github.com/libbpf/bpftool.git \
     && cd bpftool/src && make install && cd /app \
