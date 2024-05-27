@@ -10,8 +10,8 @@ RUN apt-get update \
     && rustup toolchain install nightly-2024-05-18 \
     && rustup default nightly-2024-05-18 \
     && rustup component add rust-src --toolchain nightly-2024-05-18 \
-    && echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | sudo tee /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
-    && echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | sudo tee -a /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
+    && echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | tee /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
+    && echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | tee -a /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
     && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
     && apt-get update && apt-get install -y llvm-18-dev libclang-18-dev libpolly-18-dev \
     && cargo install bpf-linker --no-default-features \
