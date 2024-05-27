@@ -1,5 +1,0 @@
-FROM alpine
-
-WORKDIR /app
-
-RUN apk add curl
