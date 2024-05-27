@@ -2,4 +2,4 @@ FROM alpine
 
 WORKDIR /app
 
-RUN apk install curl
+RUN apk add curl
