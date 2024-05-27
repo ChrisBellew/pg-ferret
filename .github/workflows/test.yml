@@ -44,6 +44,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: Dockerfile.test
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/test:latest
           platforms: linux/amd64,linux/arm64
