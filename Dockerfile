@@ -11,7 +11,7 @@ RUN apt-get update \
     && rustup default nightly-2024-05-18 \
     && rustup component add rust-src --toolchain nightly-2024-05-18 \
     && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" \
-    && apt-get update && apt-get install -y libpolly-18-dev \
+    && apt-get update && apt-get install -y libpolly-18-dev libzstd-dev \
     && cargo install bpf-linker --no-default-features \
     && git clone --recurse-submodules https://github.com/libbpf/bpftool.git \
     && cd bpftool/src && make install && cd /app \
