@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies and Rust
 RUN apt-get update \
-    && apt-get install -y wget curl git libelf-dev build-essential software-properties-common libpolly-17-dev \
+    && apt-get install -y wget curl git libelf-dev build-essential software-properties-common libpolly-16-dev \
     && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y \
     && export PATH="/root/.cargo/bin:${PATH}" \
     && rustup toolchain install nightly-2024-05-18 \
