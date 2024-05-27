@@ -8,6 +8,7 @@ WORKDIR /app
 
 RUN apt-get install -y build-essential systemtap-sdt-dev libreadline-dev zlib1g-dev libsystemd-dev libicu-dev llvm-18-dev libclang-18-dev libpolly-18-dev
 
+RUN ln -s /usr/lib/llvm-18/bin/llvm-config /usr/bin/llvm-config
 RUN llvm-config --version
 
 # Install rust 
