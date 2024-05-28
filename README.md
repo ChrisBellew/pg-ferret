@@ -40,8 +40,9 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 To give it a spin, try the all-in-one Docker image. This creates a container with Postgres, PG Ferret, Grafana Tempo and Grafana inside. Use it just like a normal Postgres container. You will need to run it in privileged mode for eBPF to work though.
 
-```bash
-# Start the all-in-one container
+#### 1. Start the all-in-one container
+
+```sh
 docker pull cbellew/pg-ferret:latest &&
 docker run -it \
   -e POSTGRES_DB=mydb \
@@ -49,18 +50,18 @@ docker run -it \
   -e POSTGRES_PASSWORD=mypass \
   --privileged -p 5432:5432 -p 3000:3000 \
   cbellew/pg-ferret:latest
+```
 
-# Wait a second and fire a test query
+#### 2. Wait a second and fire a test query 
+```sh
 docker run --rm \
   -e PGPASSWORD=mypass \
   --network=host \
   postgres:16 \
   /usr/lib/postgresql/16/bin/psql -U myuser -h localhost -p 5432 -d mydb -c \
   "SELECT COUNT(*) FROM pg_tablespace"
-
-# Check out the trace inside the embedded Grafana
-open http://localhost:3000/explore?left=%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22queryType%22%3A%22traceqlSearch%22%7D%5D%7D
 ```
+#### 3. [Open Grafana](http://localhost:3000/explore?left=%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22queryType%22%3A%22traceqlSearch%22%7D%5D%7D) to check out the traces.
 
 ## How it works
 
