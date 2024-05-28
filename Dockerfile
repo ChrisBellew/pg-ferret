@@ -13,7 +13,7 @@ RUN apt-get update \
     && echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | tee /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
     && echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-18 main" | tee -a /etc/apt/sources.list.d/llvm-toolchain-bookworm-18.list \
     && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - \
-    && apt-get update && apt-get install -y systemtap-sdt-dev libreadline-dev zlib1g-dev libsystemd-dev libicu-dev llvm-18-dev libclang-18-dev libpolly-18-dev \
+    && apt-get update && apt-get install -y systemtap-sdt-dev libreadline-dev zlib1g-dev libsystemd-dev libicu-dev llvm-18-dev libclang-18-dev libpolly-18-dev libzstd-dev \
     && ln -s /usr/lib/llvm-18/bin/llvm-config /usr/bin/llvm-config \
     && llvm-config --version \
     && cargo install bpf-linker --no-default-features \
