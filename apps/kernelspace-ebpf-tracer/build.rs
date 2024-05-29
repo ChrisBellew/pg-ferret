@@ -2,11 +2,10 @@ use std::{fs::File, io::Write};
 
 include!("../shared/src/postgres_funcs.rs");
 
-fn main() {
-    let mut hooks = File::create("src/generated/hooks.rs").unwrap();
-    hooks
-        .write_all(generate_ebpf_hooks(POSTGRES_FUNCS).to_string().as_bytes())
-        .unwrap();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut hooks = File::create("src/generated/hooks.rs")?;
+    hooks.write_all(generate_ebpf_hooks(POSTGRES_FUNCS).to_string().as_bytes())?;
+    Ok(())
 }
 
 fn generate_ebpf_hooks(postgres_funcs: &[&str]) -> String {
@@ -15,13 +14,15 @@ fn generate_ebpf_hooks(postgres_funcs: &[&str]) -> String {
       pub fn [NAME]_entry(ctx: ProbeContext) -> u32 {
         let thread_id = ctx.tgid();
         let func = str_to_func("[NAME]");
-        submit_entry(ctx, PostgresEntry::Other(func, thread_id))
+        submit_entry(ctx, PostgresEntry::Other(func, thread_id));
+        0
       }
 
       #[uretprobe]
       pub fn [NAME]_return(ctx: ProbeContext) -> u32 {
         let thread_id = ctx.tgid();
-        submit_return(ctx, "[NAME]", thread_id)
+        submit_return(ctx, "[NAME]", thread_id);
+        0
       }
     "#;
     let mut hooks = String::new();

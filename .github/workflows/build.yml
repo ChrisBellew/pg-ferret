@@ -48,6 +48,3 @@ jobs:
           platforms: linux/arm64, linux/amd64
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-
-      # - name: Verify multi-architecture image
-      #   run: docker run --rm ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest uname -m
