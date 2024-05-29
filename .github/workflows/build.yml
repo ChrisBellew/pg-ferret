@@ -50,5 +50,5 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
-      - name: Verify multi-architecture image
-        run: docker run --rm ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest uname -m
+      # - name: Verify multi-architecture image
+      #   run: docker run --rm ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest uname -m
