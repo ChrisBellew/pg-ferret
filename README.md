@@ -38,7 +38,7 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 ### Quick start
 
-To give it a spin, try the all-in-one Docker image. This creates a container with Postgres, PG Ferret, Grafana Tempo and Grafana inside. Use it just like a normal Postgres container. You will need to run it in privileged mode for eBPF to work though.
+To give it a spin, try the all-in-one Docker image. This creates a container with Postgres, PG Ferret, Grafana Tempo and Grafana inside. Use it just like a normal Postgres container and visit Grafana on port 3000 to view traces. You will need to run it in privileged mode for eBPF to work though.
 
 #### 1. Start the all-in-one container
 
@@ -67,7 +67,7 @@ docker run --rm \
 
 ### Slim image - bring your own tracing backend
 
-The all-in-one image provides Grafana and Tempo built in, but if you have your own tracing backend you can use the slim PG Ferret image which just has Postgres and PG Ferret built in. Configure the `OTEL_TRACING_ENDPOINT` env var send PG Ferret will send traces there in OTLP format.
+The all-in-one image provides Grafana and Tempo built in, but if you have your own tracing backend you can use the slim PG Ferret image which just has Postgres and PG Ferret built in. Configure the `OTEL_TRACING_ENDPOINT` environment variable and PG Ferret will send traces there in OTLP format.
 
 #### 1. Start the slim image
 
