@@ -18,3 +18,9 @@ storage:
     backend: local
     local:
       path: /var/tempo/traces
+
+overrides:
+  # Tempo will allow max 10000 traces per user to be stored.
+  # Given we only have one user creating traces, we can
+  # set this to a high value.
+  max_traces_per_user: 1000000
