@@ -1,13 +1,16 @@
 use opentelemetry::trace::{SpanId, TraceId};
 use opentelemetry::trace::{TraceContextExt, Tracer};
 use opentelemetry::{global, Context, KeyValue};
-use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_otlp::{new_exporter, HasExportConfig, WithExportConfig};
 use opentelemetry_sdk::propagation::TraceContextPropagator;
 use opentelemetry_sdk::trace::{config, BatchConfigBuilder, Sampler};
 use opentelemetry_sdk::Resource;
 use pg_ferret_shared::{Pid, ThreadId};
 use std::collections::HashMap;
+use std::env;
+use std::str::FromStr;
 use std::sync::{Arc, Mutex};
+use tonic::metadata::{MetadataMap, MetadataValue};
 
 #[derive(Clone)]
 pub struct TraceEmitter {
@@ -21,9 +24,28 @@ type ThreadContexts = Arc<Mutex<HashMap<u32, Vec<(String, Context)>>>>;
 type TraceIds = Arc<Mutex<HashMap<u32, u128>>>;
 type RemoteContexts = Arc<Mutex<HashMap<u32, Context>>>;
 
+lazy_static::lazy_static! {
+    /// The tonic OTLP exporter requires that the metadata headers are static, so
+    /// we need to load them at startup and store them in a static variable.
+    static ref OTEL_EXPORTER_OTLP_HEADERS: String = {
+        env::var("OTEL_EXPORTER_OTLP_HEADERS").unwrap_or_default()
+    };
+    static ref METADATA: MetadataMap = {
+        let mut metadata = MetadataMap::new();
+        for header in OTEL_EXPORTER_OTLP_HEADERS.split(',') {
+            let mut parts = header.split('=');
+            let key = parts.next().unwrap();
+            let value = parts.next().unwrap();
+            metadata.insert(key, MetadataValue::from_str(value).unwrap());
+        }
+        println!("Using {} headers for OTLP", metadata.len());
+        metadata
+    };
+}
+
 impl TraceEmitter {
-    pub fn initialise(backend_endpoint: Option<String>) -> Result<Self, anyhow::Error> {
-        let endpoint = match backend_endpoint {
+    pub fn initialise(endpoint: Option<String>) -> Result<Self, anyhow::Error> {
+        let endpoint = match endpoint {
             Some(endpoint) => {
                 println!("Sending traces to {}", endpoint);
                 endpoint
@@ -33,13 +55,18 @@ impl TraceEmitter {
                 "http://localhost:4317".to_string()
             }
         };
+        let mut exporter = new_exporter()
+            .tonic()
+            .with_endpoint(endpoint)
+            .with_metadata(METADATA.clone());
+        println!(
+            "Using {:?} protocol for OTLP",
+            exporter.export_config().protocol
+        );
+
         let tracer = opentelemetry_otlp::new_pipeline()
             .tracing()
-            .with_exporter(
-                opentelemetry_otlp::new_exporter()
-                    .tonic()
-                    .with_endpoint(endpoint),
-            )
+            .with_exporter(exporter)
             .with_trace_config(
                 config()
                     .with_resource(Resource::new(vec![KeyValue::new(

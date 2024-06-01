@@ -29,7 +29,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // postgres events and send them to the tracing backend using OpenTelemetry.
     // Use the provided bring-your-own backend endpoint if it's set, otherwise
     // use the built-in backend.
-    let tracing_endpoint = env::var("OTEL_TRACING_ENDPOINT")
+    let tracing_endpoint = env::var("OTEL_EXPORTER_OTLP_ENDPOINT")
         .ok()
         .filter(|val| !val.is_empty());
     let tracing = TraceEmitter::initialise(tracing_endpoint)?;

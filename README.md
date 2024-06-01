@@ -67,9 +67,9 @@ docker run --rm \
 
 ### Slim image - bring your own tracing backend
 
-The all-in-one image provides Grafana and Tempo built in, but if you have your own tracing backend you can use the slim PG Ferret image which just has Postgres and PG Ferret built in. Configure the `OTEL_TRACING_ENDPOINT` environment variable and PG Ferret will send traces there in OTLP format.
+The all-in-one image provides Grafana and Tempo built in, but if you have your own tracing backend you can use the slim PG Ferret image which just has Postgres and PG Ferret built in. Configure the `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable and PG Ferret will send traces there in OTLP format.
 
-#### 1. Start the slim image
+#### 1. Start the slim image - example for Honeycomb
 
 ```sh
 docker pull cbellew/pg-ferret-slim:latest &&
@@ -77,7 +77,8 @@ docker run -it \
   -e POSTGRES_DB=mydb \
   -e POSTGRES_USER=myuser \
   -e POSTGRES_PASSWORD=mypass \
-  -e OTEL_TRACING_ENDPOINT=http://myoteltracingbackend:4317 \
+  -e OTEL_EXPORTER_OTLP_ENDPOINT=https://api.honeycomb.io \
+  -e OTEL_EXPORTER_OTLP_HEADERS=x-honeycomb-team=MYHONEYCOMBAPIKEY \
   --privileged -p 5432:5432 \
   cbellew/pg-ferret-slim:latest
 ```
@@ -92,6 +93,8 @@ docker run --rm \
   /usr/lib/postgresql/16/bin/psql -U myuser -h localhost -p 5432 -d mydb -c \
   "SELECT COUNT(*) FROM pg_tablespace"
 ```
+
+#### 3. Check the traces in Honeycomb
 
 ## How it works
 
