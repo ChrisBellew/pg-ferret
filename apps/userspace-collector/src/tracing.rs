@@ -3,7 +3,7 @@ use opentelemetry::trace::{TraceContextExt, Tracer};
 use opentelemetry::{global, Context, KeyValue};
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_sdk::propagation::TraceContextPropagator;
-use opentelemetry_sdk::trace::{BatchConfigBuilder, Sampler};
+use opentelemetry_sdk::trace::{config, BatchConfigBuilder, Sampler};
 use opentelemetry_sdk::Resource;
 use pg_ferret_shared::{Pid, ThreadId};
 use std::collections::HashMap;
@@ -31,7 +31,7 @@ impl TraceEmitter {
                     .with_endpoint("http://localhost:4317"),
             )
             .with_trace_config(
-                opentelemetry_sdk::trace::config()
+                config()
                     .with_resource(Resource::new(vec![KeyValue::new(
                         opentelemetry_semantic_conventions::resource::SERVICE_NAME,
                         "postgres",
@@ -40,8 +40,8 @@ impl TraceEmitter {
             )
             .with_batch_config(
                 BatchConfigBuilder::default()
-                    .with_max_concurrent_exports(5)
-                    .with_max_export_batch_size(2000)
+                    .with_max_concurrent_exports(10)
+                    .with_max_export_batch_size(10000)
                     .build(),
             )
             .install_batch(opentelemetry_sdk::runtime::Tokio)?;
@@ -51,12 +51,49 @@ impl TraceEmitter {
         let contexts: ThreadContexts = Arc::new(Mutex::new(HashMap::new()));
         let trace_ids: TraceIds = Arc::new(Mutex::new(HashMap::new()));
         let remote_contexts: RemoteContexts = Arc::new(Mutex::new(HashMap::new()));
-        Ok(Self {
+
+        let tracing = Self {
             tracer,
             contexts,
             trace_ids,
             remote_contexts,
-        })
+        };
+        {
+            let tracing = tracing.clone();
+            tokio::spawn(async move {
+                tracing.record_metrics().await;
+            });
+        }
+
+        Ok(tracing)
+    }
+
+    async fn record_metrics(&self) {
+        let meter = global::meter("tracing_metadata");
+        let tracing_contexts_count = meter
+            .u64_gauge("pg_ferret_tracing_contexts_count")
+            .with_description("The number of active tracing contexts within pg ferret")
+            .init();
+        let tracing_trace_ids_count = meter
+            .u64_gauge("pg_ferret_tracing_trace_ids_count")
+            .with_description("The number of active trace ids within pg ferret")
+            .init();
+        let tracing_remote_contexts_count = meter
+            .u64_gauge("pg_ferret_tracing_remote_contexts_count")
+            .with_description("The number of active remote contexts within pg ferret")
+            .init();
+
+        loop {
+            {
+                let contexts = self.contexts.lock().unwrap();
+                let trace_ids = self.trace_ids.lock().unwrap();
+                let remote_contexts = self.remote_contexts.lock().unwrap();
+                tracing_contexts_count.record(contexts.len() as u64, &[]);
+                tracing_trace_ids_count.record(trace_ids.len() as u64, &[]);
+                tracing_remote_contexts_count.record(remote_contexts.len() as u64, &[]);
+            }
+            tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+        }
     }
 
     #[allow(clippy::too_many_arguments)]

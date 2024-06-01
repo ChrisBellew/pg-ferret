@@ -2,6 +2,7 @@ use aya::maps::{AsyncPerfEventArray, MapData};
 use aya::util::online_cpus;
 use bpf::{attach_uprobes, init_bpf};
 use log::info;
+use metrics::init_metrics;
 use receive::listen_to_cpu;
 use std::error::Error;
 use tokio::signal;
@@ -9,6 +10,7 @@ use tracing::TraceEmitter;
 
 mod bpf;
 mod generated;
+mod metrics;
 mod receive;
 mod tracing;
 
@@ -25,6 +27,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // Initialise the tracing system. We'll build traces from the
     // postgres events and send them to the tracing backend using OpenTelemetry.
     let tracing = TraceEmitter::initialise()?;
+
+    // Initialise the metrics prometheus exporter. We'll collect metrics
+    // about the postgres queries and this userspace collector, and expose
+    // them on a HTTP /metrics endpoint in prometheus format.
+    init_metrics();
 
     // Create a queue to receive events from the eBPF program.
     let mut queue: AsyncPerfEventArray<MapData> =
