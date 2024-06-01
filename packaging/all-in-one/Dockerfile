@@ -2,16 +2,6 @@ FROM cbellew/pg-ferret-slim:latest
 
 WORKDIR /app
 
-RUN ARCH=$(uname -m) && \
-  if [ "$ARCH" = "x86_64" ]; then \
-    TEMPO_ARCH="amd64"; \
-  elif [ "$ARCH" = "aarch64" ]; then \
-    TEMPO_ARCH="arm64"; \
-  else \
-    echo "Unsupported architecture: $ARCH"; exit 1; \
-  fi && \
-  curl -L -o tempo_2.0.0_linux_$TEMPO_ARCH.deb https://github.com/grafana/tempo/releases/download/v2.0.0/tempo_2.0.0_linux_$TEMPO_ARCH.deb
-
 # Install Tempo and Grafana
 RUN apt-get update \
   && apt-get install -y software-properties-common curl \
@@ -19,6 +9,15 @@ RUN apt-get update \
   && curl -s https://packages.grafana.com/gpg.key | apt-key add - \
   && apt-get update \
   && apt-get install -y grafana \
+  && ARCH=$(uname -m) && \
+  if [ "$ARCH" = "x86_64" ]; then \
+    TEMPO_ARCH="amd64"; \
+  elif [ "$ARCH" = "aarch64" ]; then \
+    TEMPO_ARCH="arm64"; \
+  else \
+    echo "Unsupported architecture: $ARCH"; exit 1; \
+  fi && \
+  curl -L -o tempo_2.0.0_linux_$TEMPO_ARCH.deb https://github.com/grafana/tempo/releases/download/v2.0.0/tempo_2.0.0_linux_$TEMPO_ARCH.deb \
   && dpkg -i tempo_2.0.0_linux_*.deb \
   && rm tempo_2.0.0_linux_*.deb \
   && apt-get install -y grafana \
