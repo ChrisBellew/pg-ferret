@@ -72,14 +72,14 @@ The all-in-one image provides Grafana and Tempo built in, but if you have your o
 #### 1. Start the slim image
 
 ```sh
-docker pull cbellew/pg-ferret:latest &&
+docker pull cbellew/pg-ferret-slim:latest &&
 docker run -it \
   -e POSTGRES_DB=mydb \
   -e POSTGRES_USER=myuser \
   -e POSTGRES_PASSWORD=mypass \
   -e OTEL_TRACING_ENDPOINT=http://myoteltracingbackend:4317 \
   --privileged -p 5432:5432 \
-  cbellew/pg-ferret:latest
+  cbellew/pg-ferret-slim:latest
 ```
 
 #### 2. Wait a second and fire a test query

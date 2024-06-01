@@ -39,13 +39,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx
 
-      - name: Build and push base image
+      - name: Build and push slim image
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile.base
+          file: ./packaging/slim/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret-slim:latest
           platforms: linux/arm64, linux/amd64
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile.all-in-one
+          file: ./packaging/all-in-one/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/pg-ferret-all-in-one:latest
           platforms: linux/arm64, linux/amd64

@@ -33,7 +33,7 @@ FROM cbellew/pg-ferret-postgres-16:latest
 WORKDIR /app
 COPY --from=builder /app/target/release/userspace-collector /usr/local/bin/userspace-collector
 
-COPY /packaging/base/start.sh /usr/local/bin/start.sh
+COPY /packaging/slim/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
 EXPOSE 5432

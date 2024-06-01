@@ -1,4 +1,4 @@
-FROM cbellew/pg-ferret:latest
+FROM cbellew/pg-ferret-slim:latest
 
 WORKDIR /app
 
