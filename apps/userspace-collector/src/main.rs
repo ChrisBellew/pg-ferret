@@ -4,6 +4,7 @@ use bpf::{attach_uprobes, init_bpf};
 use log::info;
 use metrics::init_metrics;
 use receive::listen_to_cpu;
+use std::env;
 use std::error::Error;
 use tokio::signal;
 use tracing::TraceEmitter;
@@ -26,7 +27,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // Initialise the tracing system. We'll build traces from the
     // postgres events and send them to the tracing backend using OpenTelemetry.
-    let tracing = TraceEmitter::initialise()?;
+    // Use the provided bring-your-own backend endpoint if it's set, otherwise
+    // use the built-in backend.
+    let tracing_endpoint = env::var("OTEL_TRACING_ENDPOINT")
+        .ok()
+        .filter(|val| !val.is_empty());
+    let tracing = TraceEmitter::initialise(tracing_endpoint)?;
 
     // Initialise the metrics prometheus exporter. We'll collect metrics
     // about the postgres queries and this userspace collector, and expose

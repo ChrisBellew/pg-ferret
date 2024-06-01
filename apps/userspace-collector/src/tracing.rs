@@ -22,13 +22,23 @@ type TraceIds = Arc<Mutex<HashMap<u32, u128>>>;
 type RemoteContexts = Arc<Mutex<HashMap<u32, Context>>>;
 
 impl TraceEmitter {
-    pub fn initialise() -> Result<Self, anyhow::Error> {
+    pub fn initialise(backend_endpoint: Option<String>) -> Result<Self, anyhow::Error> {
+        let endpoint = match backend_endpoint {
+            Some(endpoint) => {
+                println!("Sending traces to {}", endpoint);
+                endpoint
+            }
+            None => {
+                println!("Sending traces to built-in backend");
+                "http://localhost:4317".to_string()
+            }
+        };
         let tracer = opentelemetry_otlp::new_pipeline()
             .tracing()
             .with_exporter(
                 opentelemetry_otlp::new_exporter()
                     .tonic()
-                    .with_endpoint("http://localhost:4317"),
+                    .with_endpoint(endpoint),
             )
             .with_trace_config(
                 config()
