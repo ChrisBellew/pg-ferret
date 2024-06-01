@@ -26,14 +26,17 @@ RUN apt-get update \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY grafana.ini /etc/grafana/grafana.ini
-COPY tempo.yaml /etc/tempo/tempo.yaml
-COPY tempo-datasource.yaml /etc/grafana/provisioning/datasources/tempo-datasource.yaml
+COPY ./packaging/all-in-one/grafana.ini /etc/grafana/grafana.ini
+COPY ./packaging/all-in-one/tempo.yaml /etc/tempo/tempo.yaml
+COPY ./packaging/all-in-one/tempo-datasource.yaml /etc/grafana/provisioning/datasources/tempo-datasource.yaml
 
 ENV GF_AUTH_DISABLE_LOGIN_FORM=true
 ENV GF_AUTH_ANONYMOUS_ENABLED=true
 ENV GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
 ENV GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION=true
+
+COPY /packaging/all-in-one/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
 EXPOSE 5432 3000
 

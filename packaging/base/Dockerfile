@@ -23,7 +23,7 @@ RUN apt-get update \
     && apt-get clean
 
 # Copy source code and build
-COPY /apps /app
+COPY ./apps /app
 RUN /root/.cargo/bin/cargo xtask build-ebpf --release \
     && /root/.cargo/bin/cargo build --release
     
@@ -33,7 +33,7 @@ FROM cbellew/pg-ferret-postgres-16:latest
 WORKDIR /app
 COPY --from=builder /app/target/release/userspace-collector /usr/local/bin/userspace-collector
 
-COPY start.sh /usr/local/bin/start.sh
+COPY /packaging/base/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
 EXPOSE 5432

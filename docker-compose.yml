@@ -1,26 +1,48 @@
 services:
-  postgres:
-    image: postgres
-    container_name: pg_ferret_postgres
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
     ports:
-      - 5442:5432
+      - "3000:3000"
+    networks:
+      - pg_ferret
+    depends_on:
+      - tempo
+    volumes:
+      - ./packaging/base/tempo-datasource.yaml:/etc/grafana/provisioning/datasources/tempo-datasource.yaml
     environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: user
-      POSTGRES_DB: db
-    # volumes:
-    #   - postgres_data:/var/lib/postgresql/data
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: "true"
+      GF_LOG_LEVEL: warning
 
-  tracer:
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    networks:
+      - pg_ferret
+    volumes:
+      - ./packaging/all-in-one/tempo.yaml:/etc/tempo.yaml
+    command:
+      - "-config.file=/etc/tempo.yaml"
+
+  postgres:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: pg_ferret_tracer
-    depends_on:
-      - postgres
-    pid: host
+      dockerfile: ./packaging/base/Dockerfile
+    container_name: postgres
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypass
+      OTEL_TRACING_ENDPOINT: "http://tempo:4317"
     privileged: true
-    volumes:
-      - /usr/local/pgsql/bin/postgres:/usr/local/pgsql/bin/postgres
-# volumes:
-#   postgres_data:
+    ports:
+      - "5432:5432"
+      - "3001:3001"
+    networks:
+      - pg_ferret
+
+networks:
+  pg_ferret:

@@ -20,7 +20,7 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 
 ⚡️ Low overhead auto-instrumentation with eBPF. Rust in the kernel and userspace [Obligatory _blazingly fast_].
 
-🗃️ Built in trace storage with Grafana Tempo and trace visualisation with Grafana <!--  - Or bring your own OpenTelemetry backend (Grafana Tempo, Jaeger, Zipkin, Honeycomb, Datadog, etc.)-->
+🗃️ Built in trace storage with Grafana Tempo and trace visualisation with Grafana. Or bring your own OpenTelemetry backend (Grafana Tempo, Jaeger, Zipkin, Honeycomb, Datadog, etc).
 
 📦 Special debug build of Postgres included. Small (currently unmeasured) performance overhead
 
@@ -43,16 +43,17 @@ To give it a spin, try the all-in-one Docker image. This creates a container wit
 #### 1. Start the all-in-one container
 
 ```sh
-docker pull cbellew/pg-ferret:latest &&
+docker pull cbellew/pg-ferret-all-in-one:latest &&
 docker run -it \
   -e POSTGRES_DB=mydb \
   -e POSTGRES_USER=myuser \
   -e POSTGRES_PASSWORD=mypass \
   --privileged -p 5432:5432 -p 3000:3000 \
-  cbellew/pg-ferret:latest
+  cbellew/pg-ferret-all-in-one:latest
 ```
 
-#### 2. Wait a second and fire a test query 
+#### 2. Wait a second and fire a test query
+
 ```sh
 docker run --rm \
   -e PGPASSWORD=mypass \
@@ -61,7 +62,36 @@ docker run --rm \
   /usr/lib/postgresql/16/bin/psql -U myuser -h localhost -p 5432 -d mydb -c \
   "SELECT COUNT(*) FROM pg_tablespace"
 ```
+
 #### 3. [Open Grafana](http://localhost:3000/explore?left=%7B%22datasource%22%3A%22tempo%22%2C%22queries%22%3A%5B%7B%22queryType%22%3A%22traceqlSearch%22%7D%5D%7D) to check out the traces.
+
+### Slim image - bring your own tracing backend
+
+The all-in-one image provides Grafana and Tempo built in, but if you have your own tracing backend you can use the slim PG Ferret image which just has Postgres and PG Ferret built in. Configure the `OTEL_TRACING_ENDPOINT` env var send PG Ferret will send traces there in OTLP format.
+
+#### 1. Start the slim image
+
+```sh
+docker pull cbellew/pg-ferret:latest &&
+docker run -it \
+  -e POSTGRES_DB=mydb \
+  -e POSTGRES_USER=myuser \
+  -e POSTGRES_PASSWORD=mypass \
+  -e OTEL_TRACING_ENDPOINT=http://myoteltracingbackend:4317 \
+  --privileged -p 5432:5432 \
+  cbellew/pg-ferret:latest
+```
+
+#### 2. Wait a second and fire a test query
+
+```sh
+docker run --rm \
+  -e PGPASSWORD=mypass \
+  --network=host \
+  postgres:16 \
+  /usr/lib/postgresql/16/bin/psql -U myuser -h localhost -p 5432 -d mydb -c \
+  "SELECT COUNT(*) FROM pg_tablespace"
+```
 
 ## How it works
 
