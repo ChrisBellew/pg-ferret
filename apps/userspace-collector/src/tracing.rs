@@ -27,16 +27,18 @@ type RemoteContexts = Arc<Mutex<HashMap<u32, Context>>>;
 lazy_static::lazy_static! {
     /// The tonic OTLP exporter requires that the metadata headers are static, so
     /// we need to load them at startup and store them in a static variable.
-    static ref OTEL_EXPORTER_OTLP_HEADERS: String = {
-        env::var("OTEL_EXPORTER_OTLP_HEADERS").unwrap_or_default()
+    static ref OTEL_EXPORTER_OTLP_HEADERS: Option<String> = {
+        env::var("OTEL_EXPORTER_OTLP_HEADERS").ok()
     };
     static ref METADATA: MetadataMap = {
         let mut metadata = MetadataMap::new();
-        for header in OTEL_EXPORTER_OTLP_HEADERS.split(',') {
-            let mut parts = header.split('=');
-            let key = parts.next().unwrap();
-            let value = parts.next().unwrap();
-            metadata.insert(key, MetadataValue::from_str(value).unwrap());
+        if let Some(headers) = &*OTEL_EXPORTER_OTLP_HEADERS {
+            for header in headers.split(',') {
+                let mut parts = header.split('=');
+                let key = parts.next().unwrap();
+                let value = parts.next().unwrap();
+                metadata.insert(key, MetadataValue::from_str(value).unwrap());
+            }
         }
         println!("Using {} headers for OTLP", metadata.len());
         metadata
