@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: cbellew/pg-ferret-slim:latest
+    container_name: pg-ferret-postgres
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypass
+      OTEL_EXPORTER_OTLP_ENDPOINT: https://api.honeycomb.io
+      OTEL_EXPORTER_OTLP_HEADERS: x-honeycomb-team=MYHONEYCOMBAPIKEY
+    privileged: true
+    ports:
+      - "5432:5432"

@@ -96,6 +96,17 @@ docker run --rm \
 
 #### 3. Check the traces in Honeycomb
 
+### Examples
+
+Check out the docker compose examples for [Honeycomb](/examples/honeycomb/docker-compose.yml) and [all-in-one](/examples/all-in-one/docker-compose.yml).
+
+### Configuration
+
+| Environment variable          | Description                                                                                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | When using the slim image, this configures the endpoint that traces should be sent to. Auth can be provided with `OTEL_EXPORTER_OTLP_HEADERS`. |
+| `OTEL_EXPORTER_OTLP_HEADERS`  | Allows custom headers to be send to the OTLP endpoint. e.g. for Honeycomb: `x-honeycomb-team=MYHONEYCOMBAPIKEY`                                |
+
 ## How it works
 
 - eBPF is a special runtime that allows sandboxed programs to run in the kernel. One use of eBPF is to have a kernel program attach to parts of code running in userspace (your programs), allowing enhanced observability without running a special debugger. PG Ferret uses eBPF to attach to Postgres which is also running in userspace.

@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: cbellew/pg-ferret-all-in-one:latest
+    container_name: pg-ferret-all-in-one
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypass
+    privileged: true
+    ports:
+      - "5432:5432"
+      - "3000:3000"
