@@ -31,7 +31,9 @@ All-in-one tracing toolkit for Postgres. Batteries included.
 ## Why
 
 - Postgres has various plugins which provide aggregated metrics into queries and locks. These are very useful, but don't tell the full story of a query path in Postgres.
-- Knowing more about the internals of Postgres helps make us better engineers.
+
+- Understanding PostgreSQL internals helps make us better engineers.
+
 - Tracing is the gold standard of observability. PG Ferret aims to bring Postgres tracing to the masses.
 
 ## Usage
@@ -109,7 +111,34 @@ Check out the docker compose examples for [Honeycomb](/examples/honeycomb/docker
 
 ## How it works
 
-- eBPF is a special runtime that allows sandboxed programs to run in the kernel. One use of eBPF is to have a kernel program attach to parts of code running in userspace (your programs), allowing enhanced observability without running a special debugger. PG Ferret uses eBPF to attach to Postgres which is also running in userspace.
-- The eBPF loader needs the memory address of each function you want to attach to. These are commonly sought from the _debugging symbols_ which are produced when a program is built, and provide a mapping from function name to memory address in the compiled executable. Debugging symbols can be embedded within the executable itself and if so, the eBPF loader has everything it needs to inject the eBPF program into the kernel and it attach it to the relevant functions.
-- PG Ferret embeds a simple program into the kernel which attaches to a few dozen key functions inside Postgres.
-- In a standard build of Postgres the debugging symbols are partially or fully stripped, which is unhelpful for eBPF, so PG Ferret ships with a special build of Postgres with these symbols intact.
+#### eBPF
+
+- eBPF is a special runtime that allows sandboxed programs to run in the Linux kernel without modifying the kernel source code or loading kernel modules.
+
+- It can be used to trace function calls in userspace (your applications) and kernelspace, process and filter network packets, and monitor low level events.
+
+#### Postgres and symbols
+
+- PG Ferret uses eBPF to attach uprobes (userspace probes) into Postgres while it is running, allowing it to trace function calls inside Postgres without modifying the source code.
+
+- To attach a uprobe to a program you need debugging symbols which tell the loader where to find the compiled function in the executable.
+
+- Official Postgres docker images don't ship with debugging symbols - they are stripped after Postgres is built.
+
+- PG Ferret ships with a special debug build of Postgres which includes a richer set of symbols and skips the stripping step, keeping them intact, embedding the `postgres` executable itself.
+
+#### Tracing flow
+
+- PG Ferret starts a collector program that runs in userspace which has an eBPF program embedded inside of it.
+
+- The userspace collector loads the eBPF into the kernel using the eBPF API.
+
+- The kernel loads the eBPF program and attaches it to the uprobes (function calls) in Postgres.
+
+- Whenever an attached function is called in Postgres, the kernel runs the eBPF code before and after the function is executed. This happens on the same CPU core that the Postgres function is running.
+
+- The eBPF program packages the call information into an `event`, as called by PG Ferret, and adds it to an eBPF map which acts as a queue between the eBPF program in kernelspace and the collector in userspace. An event is emitted for each invocation and return of each function.
+
+- The userspace collector polls the map for events, then collects the events and ties them together into spans.
+
+- The userspace collector prepares the call spans into a trace and emits them using the OpenTelemetry OTLP protocol to a tracing collector. In the all-in-one package of PG Ferret this is a built in Grafana Tempo instance, but in the slim image, it's whatever downstream collector you configure.
